@@ -1,0 +1,63 @@
+# Publishes a Windows installer that was built in the private source repo.
+#
+# The source repo's "Windows installer" workflow keeps each build as a run
+# artifact. To publish one, push publish.json on this branch with the tag,
+# the artifact's short-lived download URL and its sha256. This workflow
+# downloads the zip, checks it, and creates the release with this
+# repository's own token, so no long-lived token is stored anywhere.
+#
+# "prerelease": true keeps installed copies on the current latest release;
+# testers use the direct download link in the release notes.
+name: Publish installer
+
+on:
+  push:
+    branches:
+      - claude/novelist-fresheyes-review-du0fxh
+    paths:
+      - publish.json
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download and check the build
+        run: |
+          set -euo pipefail
+          url=$(jq -r .artifact_url publish.json)
+          want=$(jq -r .artifact_sha256 publish.json)
+          tag=$(jq -r .tag publish.json)
+          curl -sSfL -o build.zip "$url"
+          got=$(sha256sum build.zip | cut -d' ' -f1)
+          [ "$got" = "$want" ] || { echo "Download does not match: $got"; exit 1; }
+          mkdir build
+          unzip -q build.zip -d build
+          ls -l build
+          exe=$(sed -n 's/^path: *//p' build/latest.yml | tr -d '\r')
+          listed=$(sed -n 's/^sha512: *//p' build/latest.yml | tr -d '\r')
+          actual=$(openssl dgst -sha512 -binary "build/$exe" | base64 -w0)
+          [ "$actual" = "$listed" ] || { echo "The installer does not match latest.yml"; exit 1; }
+          version=$(sed -n 's/^version: *//p' build/latest.yml | tr -d '\r')
+          [ "v$version" = "$tag" ] || { echo "Tag $tag does not match version $version"; exit 1; }
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=$(jq -r .tag publish.json)
+          title=$(jq -r .title publish.json)
+          jq -r .notes publish.json > notes.md
+          if [ "$(jq -r .prerelease publish.json)" = "true" ]; then kind=--prerelease; else kind=--latest; fi
+          if gh release view "$tag" > /dev/null 2>&1; then
+            gh release upload "$tag" build/* --clobber
+          else
+            gh release create "$tag" build/* --target master --title "$title" --notes-file notes.md "$kind"
+          fi
+          gh release view "$tag" --json url,isPrerelease,assets --jq '{url, isPrerelease, assets: [.assets[].name]}'
