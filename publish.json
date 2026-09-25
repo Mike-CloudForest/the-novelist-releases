@@ -1,0 +1,9 @@
+{
+  "tag": "v2.1.1",
+  "title": "The Novelist 2.1.1 (tester build)",
+  "prerelease": true,
+  "artifact_url": "https://productionresultssa2.blob.core.windows.net/actions-results/601e551e-a88d-4651-a4c6-73ee63751333/workflow-job-run-2c4cdf40-e829-59ce-979f-12d6bdda0f4a/artifacts/ef8b842e271ee2f0b66b55fac7f0f63aefcf474a5686e8bb6a95f31f965e6fc7.zip?rscd=attachment%3B+filename%3D%22The-Novelist-Setup-2.1.1.zip%22&rsct=application%2Fzip&se=2026-09-25T17%3A52%3A58Z&sig=9vav1%2FMKMc3Xwo18Rr3UawB2Ew9IhdOQlO7glWCrLu8%3D&ske=2026-09-25T21%3A36%3A19Z&skoid=ca7593d4-ee42-46cd-af88-8b886a2f84eb&sks=b&skt=2026-09-25T17%3A36%3A19Z&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skv=2025-11-05&sp=r&spr=https&sr=b&st=2026-09-25T17%3A42%3A53Z&sv=2025-11-05",
+  "artifact_sha256": "1581a05a355ad3a1c0d5a955ba9345def167a5105846d5cbacea539f8a094d69",
+  "source_commit": "482691ca99b27ffd27694080de6cbf3ee02261d8",
+  "notes": "Tester build of The Novelist 2.1.1. It is marked as a pre-release, so installed copies stay on 2.1.0 until this build is published as the latest release.\n\nDirect download: https://github.com/Mike-CloudForest/the-novelist-releases/releases/download/v2.1.1/The-Novelist-Setup-2.1.1.exe\n\nNew since 2.1.0:\n- New books ask for a title and pen name and are saved from the first word.\n- Book Setup finds titled names such as \"Captain Ashworth\" and leaves places unticked. Renaming a character can change the name everywhere in the book.\n- Proofreading lists name the chapter of each finding, and a click jumps to the word with its fix open.\n- Ghostwriter says where a draft will go and how many drafts are left today.\n- The license screen says why a key failed, and a computer that was removed can activate again.\n- Keyboard menus, a clearer focus ring and a steady text cursor.\n- Print PDFs embed their page-number font, so KDP accepts them.\n"
+}
