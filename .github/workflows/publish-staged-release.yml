@@ -1,0 +1,39 @@
+name: Publish tested Windows release
+
+on:
+  push:
+    branches: ['release-staging/**']
+    paths:
+      - incoming/**
+      - scripts/**
+      - package*.json
+      - .github/workflows/publish-staged-release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: novelist-stable-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'Mike-CloudForest/the-novelist-releases' && startsWith(github.ref, 'refs/heads/release-staging/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=high
+      - run: npm test
+      - name: Reconstruct and verify the Windows-tested payload
+        run: node scripts/staged-release.mjs reconstruct
+      - name: Stage draft, verify downloaded assets, and publish stable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/staged-release.mjs publish
