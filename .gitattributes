@@ -1,0 +1,2 @@
+# Transfer files stay byte-identical, including Windows line endings.
+incoming/** -text whitespace=cr-at-eol
